@@ -191,6 +191,7 @@ void initSaiApi()
         gProfileMap[SAI_REDIS_KEY_CONTEXT_CONFIG] = CONTEXT_CFG_FILE;
     }
 
+    gProfileMap[SAI_REDIS_KEY_ENABLE_CLIENT] = "true";
     sai_api_initialize(0, (const sai_service_method_table_t *)&test_services);
 
     sai_api_query(SAI_API_SWITCH,               (void **)&sai_switch_api);
