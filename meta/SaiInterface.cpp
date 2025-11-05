@@ -1,5 +1,5 @@
 #include "SaiInterface.h"
-
+#include "sai_serialize.h"
 #include "swss/logger.h"
 
 using namespace sairedis;
@@ -20,74 +20,99 @@ sai_status_t SaiInterface::create(
 
         return SAI_STATUS_FAILURE;
     }
-
+    sai_status_t status = SAI_STATUS_NOT_EXECUTED;
+    SWSS_LOG_DEBUG("SAIInterface::create start: %s", sai_serialize_object_type(metaKey.objecttype).c_str());
     if (info->isobjectid)
     {
-        return create(metaKey.objecttype, &metaKey.objectkey.key.object_id, switch_id, attr_count, attr_list);
+        status = create(metaKey.objecttype, &metaKey.objectkey.key.object_id, switch_id, attr_count, attr_list);
+    }
+    else {
+        switch ((int)info->objecttype)
+        {
+            case SAI_OBJECT_TYPE_FDB_ENTRY:
+                status = create(&metaKey.objectkey.key.fdb_entry, attr_count, attr_list);
+                break;
+
+            case SAI_OBJECT_TYPE_ROUTE_ENTRY:
+                status = create(&metaKey.objectkey.key.route_entry, attr_count, attr_list);
+                break;
+
+            case SAI_OBJECT_TYPE_NEIGHBOR_ENTRY:
+                status = create(&metaKey.objectkey.key.neighbor_entry, attr_count, attr_list);
+                break;
+
+            case SAI_OBJECT_TYPE_NAT_ENTRY:
+                status = create(&metaKey.objectkey.key.nat_entry, attr_count, attr_list);
+                break;
+
+            case SAI_OBJECT_TYPE_INSEG_ENTRY:
+                status = create(&metaKey.objectkey.key.inseg_entry, attr_count, attr_list);
+                break;
+
+            case SAI_OBJECT_TYPE_MY_SID_ENTRY:
+                status = create(&metaKey.objectkey.key.my_sid_entry, attr_count, attr_list);
+                break;
+
+            case SAI_OBJECT_TYPE_DIRECTION_LOOKUP_ENTRY:
+                status = create(&metaKey.objectkey.key.direction_lookup_entry, attr_count, attr_list);
+                break;
+
+            case SAI_OBJECT_TYPE_ENI_ETHER_ADDRESS_MAP_ENTRY:
+                status = create(&metaKey.objectkey.key.eni_ether_address_map_entry, attr_count, attr_list);
+                break;
+
+            case SAI_OBJECT_TYPE_VIP_ENTRY:
+                status = create(&metaKey.objectkey.key.vip_entry, attr_count, attr_list);
+                break;
+
+            case SAI_OBJECT_TYPE_INBOUND_ROUTING_ENTRY:
+                status = create(&metaKey.objectkey.key.inbound_routing_entry, attr_count, attr_list);
+                break;
+
+            case SAI_OBJECT_TYPE_PA_VALIDATION_ENTRY:
+                status = create(&metaKey.objectkey.key.pa_validation_entry, attr_count, attr_list);
+                break;
+
+            case SAI_OBJECT_TYPE_OUTBOUND_ROUTING_ENTRY:
+                status = create(&metaKey.objectkey.key.outbound_routing_entry, attr_count, attr_list);
+                break;
+
+            case SAI_OBJECT_TYPE_OUTBOUND_CA_TO_PA_ENTRY:
+                status = create(&metaKey.objectkey.key.outbound_ca_to_pa_entry, attr_count, attr_list);
+                break;
+
+            case SAI_OBJECT_TYPE_OUTBOUND_PORT_MAP_PORT_RANGE_ENTRY:
+                status = create(&metaKey.objectkey.key.outbound_port_map_port_range_entry, attr_count, attr_list);
+                break;
+
+            case SAI_OBJECT_TYPE_GLOBAL_TRUSTED_VNI_ENTRY:
+                status = create(&metaKey.objectkey.key.global_trusted_vni_entry, attr_count, attr_list);
+                break;
+
+            case SAI_OBJECT_TYPE_ENI_TRUSTED_VNI_ENTRY:
+                status = create(&metaKey.objectkey.key.eni_trusted_vni_entry, attr_count, attr_list);
+                break;
+
+            case SAI_OBJECT_TYPE_IPMC_ENTRY:
+                status = create(&metaKey.objectkey.key.ipmc_entry, attr_count, attr_list);
+                break;
+
+            case SAI_OBJECT_TYPE_L2MC_ENTRY:
+                status = create(&metaKey.objectkey.key.l2mc_entry, attr_count, attr_list);
+                break;
+
+            default:
+
+                SWSS_LOG_ERROR("object type %s not implemented, FIXME", info->objecttypename);
+
+                return SAI_STATUS_FAILURE;
+        }
+
     }
 
-    switch ((int)info->objecttype)
-    {
-        case SAI_OBJECT_TYPE_FDB_ENTRY:
-            return create(&metaKey.objectkey.key.fdb_entry, attr_count, attr_list);
+    SWSS_LOG_DEBUG("SAIInterface::create end: %s", sai_serialize_object_type(metaKey.objecttype).c_str());
 
-        case SAI_OBJECT_TYPE_ROUTE_ENTRY:
-            return create(&metaKey.objectkey.key.route_entry, attr_count, attr_list);
-
-        case SAI_OBJECT_TYPE_NEIGHBOR_ENTRY:
-            return create(&metaKey.objectkey.key.neighbor_entry, attr_count, attr_list);
-
-        case SAI_OBJECT_TYPE_NAT_ENTRY:
-            return create(&metaKey.objectkey.key.nat_entry, attr_count, attr_list);
-
-        case SAI_OBJECT_TYPE_INSEG_ENTRY:
-            return create(&metaKey.objectkey.key.inseg_entry, attr_count, attr_list);
-
-        case SAI_OBJECT_TYPE_MY_SID_ENTRY:
-            return create(&metaKey.objectkey.key.my_sid_entry, attr_count, attr_list);
-
-        case SAI_OBJECT_TYPE_DIRECTION_LOOKUP_ENTRY:
-            return create(&metaKey.objectkey.key.direction_lookup_entry, attr_count, attr_list);
-
-        case SAI_OBJECT_TYPE_ENI_ETHER_ADDRESS_MAP_ENTRY:
-            return create(&metaKey.objectkey.key.eni_ether_address_map_entry, attr_count, attr_list);
-
-        case SAI_OBJECT_TYPE_VIP_ENTRY:
-            return create(&metaKey.objectkey.key.vip_entry, attr_count, attr_list);
-
-        case SAI_OBJECT_TYPE_INBOUND_ROUTING_ENTRY:
-            return create(&metaKey.objectkey.key.inbound_routing_entry, attr_count, attr_list);
-
-        case SAI_OBJECT_TYPE_PA_VALIDATION_ENTRY:
-            return create(&metaKey.objectkey.key.pa_validation_entry, attr_count, attr_list);
-
-        case SAI_OBJECT_TYPE_OUTBOUND_ROUTING_ENTRY:
-            return create(&metaKey.objectkey.key.outbound_routing_entry, attr_count, attr_list);
-
-        case SAI_OBJECT_TYPE_OUTBOUND_CA_TO_PA_ENTRY:
-            return create(&metaKey.objectkey.key.outbound_ca_to_pa_entry, attr_count, attr_list);
-
-        case SAI_OBJECT_TYPE_OUTBOUND_PORT_MAP_PORT_RANGE_ENTRY:
-            return create(&metaKey.objectkey.key.outbound_port_map_port_range_entry, attr_count, attr_list);
-
-        case SAI_OBJECT_TYPE_GLOBAL_TRUSTED_VNI_ENTRY:
-            return create(&metaKey.objectkey.key.global_trusted_vni_entry, attr_count, attr_list);
-
-        case SAI_OBJECT_TYPE_ENI_TRUSTED_VNI_ENTRY:
-            return create(&metaKey.objectkey.key.eni_trusted_vni_entry, attr_count, attr_list);
-
-        case SAI_OBJECT_TYPE_IPMC_ENTRY:
-            return create(&metaKey.objectkey.key.ipmc_entry, attr_count, attr_list);
-
-        case SAI_OBJECT_TYPE_L2MC_ENTRY:
-            return create(&metaKey.objectkey.key.l2mc_entry, attr_count, attr_list);
-
-        default:
-
-            SWSS_LOG_ERROR("object type %s not implemented, FIXME", info->objecttypename);
-
-            return SAI_STATUS_FAILURE;
-    }
+    return status;
 }
 
 sai_status_t SaiInterface::remove(
@@ -103,74 +128,100 @@ sai_status_t SaiInterface::remove(
 
         return SAI_STATUS_FAILURE;
     }
+    sai_status_t status = SAI_STATUS_NOT_EXECUTED;
+    SWSS_LOG_DEBUG("SAIInterface::remove start: %s", sai_serialize_object_type(metaKey.objecttype).c_str());
 
     if (info->isobjectid)
     {
-        return remove(metaKey.objecttype, metaKey.objectkey.key.object_id);
+        status = remove(metaKey.objecttype, metaKey.objectkey.key.object_id);
+    }
+    else {
+        switch ((int)info->objecttype)
+        {
+            case SAI_OBJECT_TYPE_FDB_ENTRY:
+                status = remove(&metaKey.objectkey.key.fdb_entry);
+                break;
+
+            case SAI_OBJECT_TYPE_ROUTE_ENTRY:
+                status = remove(&metaKey.objectkey.key.route_entry);
+                break;
+
+            case SAI_OBJECT_TYPE_NEIGHBOR_ENTRY:
+                status = remove(&metaKey.objectkey.key.neighbor_entry);
+                break;
+
+            case SAI_OBJECT_TYPE_NAT_ENTRY:
+                status = remove(&metaKey.objectkey.key.nat_entry);
+                break;
+
+            case SAI_OBJECT_TYPE_INSEG_ENTRY:
+                status = remove(&metaKey.objectkey.key.inseg_entry);
+                break;
+
+            case SAI_OBJECT_TYPE_MY_SID_ENTRY:
+                status = remove(&metaKey.objectkey.key.my_sid_entry);
+                break;
+
+            case SAI_OBJECT_TYPE_DIRECTION_LOOKUP_ENTRY:
+                status = remove(&metaKey.objectkey.key.direction_lookup_entry);
+                break;
+
+            case SAI_OBJECT_TYPE_ENI_ETHER_ADDRESS_MAP_ENTRY:
+                status = remove(&metaKey.objectkey.key.eni_ether_address_map_entry);
+                break;
+
+            case SAI_OBJECT_TYPE_VIP_ENTRY:
+                status = remove(&metaKey.objectkey.key.vip_entry);
+                break;
+
+            case SAI_OBJECT_TYPE_INBOUND_ROUTING_ENTRY:
+                status = remove(&metaKey.objectkey.key.inbound_routing_entry);
+                break;
+
+            case SAI_OBJECT_TYPE_PA_VALIDATION_ENTRY:
+                status = remove(&metaKey.objectkey.key.pa_validation_entry);
+                break;
+
+            case SAI_OBJECT_TYPE_OUTBOUND_ROUTING_ENTRY:
+                status = remove(&metaKey.objectkey.key.outbound_routing_entry);
+                break;
+
+            case SAI_OBJECT_TYPE_OUTBOUND_CA_TO_PA_ENTRY:
+                status = remove(&metaKey.objectkey.key.outbound_ca_to_pa_entry);
+                break;
+
+            case SAI_OBJECT_TYPE_OUTBOUND_PORT_MAP_PORT_RANGE_ENTRY:
+                status = remove(&metaKey.objectkey.key.outbound_port_map_port_range_entry);
+                break;
+
+            case SAI_OBJECT_TYPE_GLOBAL_TRUSTED_VNI_ENTRY:
+                status = remove(&metaKey.objectkey.key.global_trusted_vni_entry);
+                break;
+
+            case SAI_OBJECT_TYPE_ENI_TRUSTED_VNI_ENTRY:
+                status = remove(&metaKey.objectkey.key.eni_trusted_vni_entry);
+                break;
+
+            case SAI_OBJECT_TYPE_IPMC_ENTRY:
+                status = remove(&metaKey.objectkey.key.ipmc_entry);
+                break;
+
+            case SAI_OBJECT_TYPE_L2MC_ENTRY:
+                status = remove(&metaKey.objectkey.key.l2mc_entry);
+                break;
+
+            default:
+
+                SWSS_LOG_ERROR("object type %s not implemented, FIXME", info->objecttypename);
+
+                return SAI_STATUS_FAILURE;
+        }
+
     }
 
-    switch ((int)info->objecttype)
-    {
-        case SAI_OBJECT_TYPE_FDB_ENTRY:
-            return remove(&metaKey.objectkey.key.fdb_entry);
+    SWSS_LOG_DEBUG("SAIInterface::remove end: %s", sai_serialize_object_type(metaKey.objecttype).c_str());
 
-        case SAI_OBJECT_TYPE_ROUTE_ENTRY:
-            return remove(&metaKey.objectkey.key.route_entry);
-
-        case SAI_OBJECT_TYPE_NEIGHBOR_ENTRY:
-            return remove(&metaKey.objectkey.key.neighbor_entry);
-
-        case SAI_OBJECT_TYPE_NAT_ENTRY:
-            return remove(&metaKey.objectkey.key.nat_entry);
-
-        case SAI_OBJECT_TYPE_INSEG_ENTRY:
-            return remove(&metaKey.objectkey.key.inseg_entry);
-
-        case SAI_OBJECT_TYPE_MY_SID_ENTRY:
-            return remove(&metaKey.objectkey.key.my_sid_entry);
-
-        case SAI_OBJECT_TYPE_DIRECTION_LOOKUP_ENTRY:
-            return remove(&metaKey.objectkey.key.direction_lookup_entry);
-
-        case SAI_OBJECT_TYPE_ENI_ETHER_ADDRESS_MAP_ENTRY:
-            return remove(&metaKey.objectkey.key.eni_ether_address_map_entry);
-
-        case SAI_OBJECT_TYPE_VIP_ENTRY:
-            return remove(&metaKey.objectkey.key.vip_entry);
-
-        case SAI_OBJECT_TYPE_INBOUND_ROUTING_ENTRY:
-            return remove(&metaKey.objectkey.key.inbound_routing_entry);
-
-        case SAI_OBJECT_TYPE_PA_VALIDATION_ENTRY:
-            return remove(&metaKey.objectkey.key.pa_validation_entry);
-
-        case SAI_OBJECT_TYPE_OUTBOUND_ROUTING_ENTRY:
-            return remove(&metaKey.objectkey.key.outbound_routing_entry);
-
-        case SAI_OBJECT_TYPE_OUTBOUND_CA_TO_PA_ENTRY:
-            return remove(&metaKey.objectkey.key.outbound_ca_to_pa_entry);
-
-        case SAI_OBJECT_TYPE_OUTBOUND_PORT_MAP_PORT_RANGE_ENTRY:
-            return remove(&metaKey.objectkey.key.outbound_port_map_port_range_entry);
-
-        case SAI_OBJECT_TYPE_GLOBAL_TRUSTED_VNI_ENTRY:
-            return remove(&metaKey.objectkey.key.global_trusted_vni_entry);
-
-        case SAI_OBJECT_TYPE_ENI_TRUSTED_VNI_ENTRY:
-            return remove(&metaKey.objectkey.key.eni_trusted_vni_entry);
-
-        case SAI_OBJECT_TYPE_IPMC_ENTRY:
-            return remove(&metaKey.objectkey.key.ipmc_entry);
-
-        case SAI_OBJECT_TYPE_L2MC_ENTRY:
-            return remove(&metaKey.objectkey.key.l2mc_entry);
-
-        default:
-
-            SWSS_LOG_ERROR("object type %s not implemented, FIXME", info->objecttypename);
-
-            return SAI_STATUS_FAILURE;
-    }
+    return status;
 }
 
 sai_status_t SaiInterface::set(
@@ -187,74 +238,100 @@ sai_status_t SaiInterface::set(
 
         return SAI_STATUS_FAILURE;
     }
+    sai_status_t status = SAI_STATUS_NOT_EXECUTED;
+    SWSS_LOG_DEBUG("SAIInterface::set start: %s", sai_serialize_object_type(metaKey.objecttype).c_str());
 
     if (info->isobjectid)
     {
-        return set(metaKey.objecttype, metaKey.objectkey.key.object_id, attr);
+        status = set(metaKey.objecttype, metaKey.objectkey.key.object_id, attr);
+    }
+    else {
+        switch ((int)info->objecttype)
+        {
+            case SAI_OBJECT_TYPE_FDB_ENTRY:
+                status = set(&metaKey.objectkey.key.fdb_entry, attr);
+                break;
+
+            case SAI_OBJECT_TYPE_ROUTE_ENTRY:
+                status = set(&metaKey.objectkey.key.route_entry, attr);
+                break;
+
+            case SAI_OBJECT_TYPE_NEIGHBOR_ENTRY:
+                status = set(&metaKey.objectkey.key.neighbor_entry, attr);
+                break;
+
+            case SAI_OBJECT_TYPE_NAT_ENTRY:
+                status = set(&metaKey.objectkey.key.nat_entry, attr);
+                break;
+
+            case SAI_OBJECT_TYPE_INSEG_ENTRY:
+                status = set(&metaKey.objectkey.key.inseg_entry, attr);
+                break;
+
+            case SAI_OBJECT_TYPE_MY_SID_ENTRY:
+                status = set(&metaKey.objectkey.key.my_sid_entry, attr);
+                break;
+
+            case SAI_OBJECT_TYPE_DIRECTION_LOOKUP_ENTRY:
+                status = set(&metaKey.objectkey.key.direction_lookup_entry, attr);
+                break;
+
+            case SAI_OBJECT_TYPE_ENI_ETHER_ADDRESS_MAP_ENTRY:
+                status = set(&metaKey.objectkey.key.eni_ether_address_map_entry, attr);
+                break;
+
+            case SAI_OBJECT_TYPE_VIP_ENTRY:
+                status = set(&metaKey.objectkey.key.vip_entry, attr);
+                break;
+
+            case SAI_OBJECT_TYPE_INBOUND_ROUTING_ENTRY:
+                status = set(&metaKey.objectkey.key.inbound_routing_entry, attr);
+                break;
+
+            case SAI_OBJECT_TYPE_PA_VALIDATION_ENTRY:
+                status = set(&metaKey.objectkey.key.pa_validation_entry, attr);
+                break;
+
+            case SAI_OBJECT_TYPE_OUTBOUND_ROUTING_ENTRY:
+                status = set(&metaKey.objectkey.key.outbound_routing_entry, attr);
+                break;
+
+            case SAI_OBJECT_TYPE_OUTBOUND_CA_TO_PA_ENTRY:
+                status = set(&metaKey.objectkey.key.outbound_ca_to_pa_entry, attr);
+                break;
+
+            case SAI_OBJECT_TYPE_OUTBOUND_PORT_MAP_PORT_RANGE_ENTRY:
+                status = set(&metaKey.objectkey.key.outbound_port_map_port_range_entry, attr);
+                break;
+
+            case SAI_OBJECT_TYPE_GLOBAL_TRUSTED_VNI_ENTRY:
+                status = set(&metaKey.objectkey.key.global_trusted_vni_entry, attr);
+                break;
+
+            case SAI_OBJECT_TYPE_ENI_TRUSTED_VNI_ENTRY:
+                status = set(&metaKey.objectkey.key.eni_trusted_vni_entry, attr);
+                break;
+
+            case SAI_OBJECT_TYPE_IPMC_ENTRY:
+                status = set(&metaKey.objectkey.key.ipmc_entry, attr);
+                break;
+
+            case SAI_OBJECT_TYPE_L2MC_ENTRY:
+                status = set(&metaKey.objectkey.key.l2mc_entry, attr);
+                break;
+
+            default:
+
+                SWSS_LOG_ERROR("object type %s not implemented, FIXME", info->objecttypename);
+
+                return SAI_STATUS_FAILURE;
+        }
+
     }
 
-    switch ((int)info->objecttype)
-    {
-        case SAI_OBJECT_TYPE_FDB_ENTRY:
-            return set(&metaKey.objectkey.key.fdb_entry, attr);
+    SWSS_LOG_DEBUG("SAIInterface::set end: %s", sai_serialize_object_type(metaKey.objecttype).c_str());
 
-        case SAI_OBJECT_TYPE_ROUTE_ENTRY:
-            return set(&metaKey.objectkey.key.route_entry, attr);
-
-        case SAI_OBJECT_TYPE_NEIGHBOR_ENTRY:
-            return set(&metaKey.objectkey.key.neighbor_entry, attr);
-
-        case SAI_OBJECT_TYPE_NAT_ENTRY:
-            return set(&metaKey.objectkey.key.nat_entry, attr);
-
-        case SAI_OBJECT_TYPE_INSEG_ENTRY:
-            return set(&metaKey.objectkey.key.inseg_entry, attr);
-
-        case SAI_OBJECT_TYPE_MY_SID_ENTRY:
-            return set(&metaKey.objectkey.key.my_sid_entry, attr);
-
-        case SAI_OBJECT_TYPE_DIRECTION_LOOKUP_ENTRY:
-            return set(&metaKey.objectkey.key.direction_lookup_entry, attr);
-
-        case SAI_OBJECT_TYPE_ENI_ETHER_ADDRESS_MAP_ENTRY:
-            return set(&metaKey.objectkey.key.eni_ether_address_map_entry, attr);
-
-        case SAI_OBJECT_TYPE_VIP_ENTRY:
-            return set(&metaKey.objectkey.key.vip_entry, attr);
-
-        case SAI_OBJECT_TYPE_INBOUND_ROUTING_ENTRY:
-            return set(&metaKey.objectkey.key.inbound_routing_entry, attr);
-
-        case SAI_OBJECT_TYPE_PA_VALIDATION_ENTRY:
-            return set(&metaKey.objectkey.key.pa_validation_entry, attr);
-
-        case SAI_OBJECT_TYPE_OUTBOUND_ROUTING_ENTRY:
-            return set(&metaKey.objectkey.key.outbound_routing_entry, attr);
-
-        case SAI_OBJECT_TYPE_OUTBOUND_CA_TO_PA_ENTRY:
-            return set(&metaKey.objectkey.key.outbound_ca_to_pa_entry, attr);
-
-        case SAI_OBJECT_TYPE_OUTBOUND_PORT_MAP_PORT_RANGE_ENTRY:
-            return set(&metaKey.objectkey.key.outbound_port_map_port_range_entry, attr);
-
-        case SAI_OBJECT_TYPE_GLOBAL_TRUSTED_VNI_ENTRY:
-            return set(&metaKey.objectkey.key.global_trusted_vni_entry, attr);
-
-        case SAI_OBJECT_TYPE_ENI_TRUSTED_VNI_ENTRY:
-            return set(&metaKey.objectkey.key.eni_trusted_vni_entry, attr);
-
-        case SAI_OBJECT_TYPE_IPMC_ENTRY:
-            return set(&metaKey.objectkey.key.ipmc_entry, attr);
-
-        case SAI_OBJECT_TYPE_L2MC_ENTRY:
-            return set(&metaKey.objectkey.key.l2mc_entry, attr);
-
-        default:
-
-            SWSS_LOG_ERROR("object type %s not implemented, FIXME", info->objecttypename);
-
-            return SAI_STATUS_FAILURE;
-    }
+    return status;
 }
 
 sai_status_t SaiInterface::get(
@@ -272,74 +349,99 @@ sai_status_t SaiInterface::get(
 
         return SAI_STATUS_FAILURE;
     }
+    sai_status_t status = SAI_STATUS_NOT_EXECUTED;
+    SWSS_LOG_DEBUG("SAIInterface::get start: %s", sai_serialize_object_type(metaKey.objecttype).c_str());
 
     if (info->isobjectid)
     {
-        return get(metaKey.objecttype, metaKey.objectkey.key.object_id, attr_count, attr_list);
+        status = get(metaKey.objecttype, metaKey.objectkey.key.object_id, attr_count, attr_list);
+    }
+    else {
+        switch ((int)info->objecttype)
+        {
+            case SAI_OBJECT_TYPE_FDB_ENTRY:
+                status = get(&metaKey.objectkey.key.fdb_entry, attr_count, attr_list);
+                break;
+
+            case SAI_OBJECT_TYPE_ROUTE_ENTRY:
+                status = get(&metaKey.objectkey.key.route_entry, attr_count, attr_list);
+                break;
+
+            case SAI_OBJECT_TYPE_NEIGHBOR_ENTRY:
+                status = get(&metaKey.objectkey.key.neighbor_entry, attr_count, attr_list);
+                break;
+
+            case SAI_OBJECT_TYPE_NAT_ENTRY:
+                status = get(&metaKey.objectkey.key.nat_entry, attr_count, attr_list);
+                break;
+
+            case SAI_OBJECT_TYPE_INSEG_ENTRY:
+                status = get(&metaKey.objectkey.key.inseg_entry, attr_count, attr_list);
+                break;
+
+            case SAI_OBJECT_TYPE_MY_SID_ENTRY:
+                status = get(&metaKey.objectkey.key.my_sid_entry, attr_count, attr_list);
+                break;
+
+            case SAI_OBJECT_TYPE_DIRECTION_LOOKUP_ENTRY:
+                status = get(&metaKey.objectkey.key.direction_lookup_entry, attr_count, attr_list);
+                break;
+
+            case SAI_OBJECT_TYPE_ENI_ETHER_ADDRESS_MAP_ENTRY:
+                status = get(&metaKey.objectkey.key.eni_ether_address_map_entry, attr_count, attr_list);
+                break;
+
+            case SAI_OBJECT_TYPE_VIP_ENTRY:
+                status = get(&metaKey.objectkey.key.vip_entry, attr_count, attr_list);
+                break;
+
+            case SAI_OBJECT_TYPE_INBOUND_ROUTING_ENTRY:
+                status = get(&metaKey.objectkey.key.inbound_routing_entry, attr_count, attr_list);
+                break;
+
+            case SAI_OBJECT_TYPE_PA_VALIDATION_ENTRY:
+                status = get(&metaKey.objectkey.key.pa_validation_entry, attr_count, attr_list);
+                break;
+
+            case SAI_OBJECT_TYPE_OUTBOUND_ROUTING_ENTRY:
+                status = get(&metaKey.objectkey.key.outbound_routing_entry, attr_count, attr_list);
+                break;
+
+            case SAI_OBJECT_TYPE_OUTBOUND_CA_TO_PA_ENTRY:
+                status = get(&metaKey.objectkey.key.outbound_ca_to_pa_entry, attr_count, attr_list);
+                break;
+
+            case SAI_OBJECT_TYPE_OUTBOUND_PORT_MAP_PORT_RANGE_ENTRY:
+                status = get(&metaKey.objectkey.key.outbound_port_map_port_range_entry, attr_count, attr_list);
+                break;
+
+            case SAI_OBJECT_TYPE_GLOBAL_TRUSTED_VNI_ENTRY:
+                status = get(&metaKey.objectkey.key.global_trusted_vni_entry, attr_count, attr_list);
+                break;
+
+            case SAI_OBJECT_TYPE_ENI_TRUSTED_VNI_ENTRY:
+                status = get(&metaKey.objectkey.key.eni_trusted_vni_entry, attr_count, attr_list);
+                break;
+
+            case SAI_OBJECT_TYPE_IPMC_ENTRY:
+                status = get(&metaKey.objectkey.key.ipmc_entry, attr_count, attr_list);
+                break;
+
+            case SAI_OBJECT_TYPE_L2MC_ENTRY:
+                status = get(&metaKey.objectkey.key.l2mc_entry, attr_count, attr_list);
+                break;
+
+            default:
+
+                SWSS_LOG_ERROR("object type %s not implemented, FIXME", info->objecttypename);
+
+                return SAI_STATUS_FAILURE;
+        }
     }
 
-    switch ((int)info->objecttype)
-    {
-        case SAI_OBJECT_TYPE_FDB_ENTRY:
-            return get(&metaKey.objectkey.key.fdb_entry, attr_count, attr_list);
+    SWSS_LOG_DEBUG("SAIInterface::get end: %s", sai_serialize_object_type(metaKey.objecttype).c_str());
 
-        case SAI_OBJECT_TYPE_ROUTE_ENTRY:
-            return get(&metaKey.objectkey.key.route_entry, attr_count, attr_list);
-
-        case SAI_OBJECT_TYPE_NEIGHBOR_ENTRY:
-            return get(&metaKey.objectkey.key.neighbor_entry, attr_count, attr_list);
-
-        case SAI_OBJECT_TYPE_NAT_ENTRY:
-            return get(&metaKey.objectkey.key.nat_entry, attr_count, attr_list);
-
-        case SAI_OBJECT_TYPE_INSEG_ENTRY:
-            return get(&metaKey.objectkey.key.inseg_entry, attr_count, attr_list);
-
-        case SAI_OBJECT_TYPE_MY_SID_ENTRY:
-            return get(&metaKey.objectkey.key.my_sid_entry, attr_count, attr_list);
-
-        case SAI_OBJECT_TYPE_DIRECTION_LOOKUP_ENTRY:
-            return get(&metaKey.objectkey.key.direction_lookup_entry, attr_count, attr_list);
-
-        case SAI_OBJECT_TYPE_ENI_ETHER_ADDRESS_MAP_ENTRY:
-            return get(&metaKey.objectkey.key.eni_ether_address_map_entry, attr_count, attr_list);
-
-        case SAI_OBJECT_TYPE_VIP_ENTRY:
-            return get(&metaKey.objectkey.key.vip_entry, attr_count, attr_list);
-
-        case SAI_OBJECT_TYPE_INBOUND_ROUTING_ENTRY:
-            return get(&metaKey.objectkey.key.inbound_routing_entry, attr_count, attr_list);
-
-        case SAI_OBJECT_TYPE_PA_VALIDATION_ENTRY:
-            return get(&metaKey.objectkey.key.pa_validation_entry, attr_count, attr_list);
-
-        case SAI_OBJECT_TYPE_OUTBOUND_ROUTING_ENTRY:
-            return get(&metaKey.objectkey.key.outbound_routing_entry, attr_count, attr_list);
-
-        case SAI_OBJECT_TYPE_OUTBOUND_CA_TO_PA_ENTRY:
-            return get(&metaKey.objectkey.key.outbound_ca_to_pa_entry, attr_count, attr_list);
-
-        case SAI_OBJECT_TYPE_OUTBOUND_PORT_MAP_PORT_RANGE_ENTRY:
-            return get(&metaKey.objectkey.key.outbound_port_map_port_range_entry, attr_count, attr_list);
-
-        case SAI_OBJECT_TYPE_GLOBAL_TRUSTED_VNI_ENTRY:
-            return get(&metaKey.objectkey.key.global_trusted_vni_entry, attr_count, attr_list);
-
-        case SAI_OBJECT_TYPE_ENI_TRUSTED_VNI_ENTRY:
-            return get(&metaKey.objectkey.key.eni_trusted_vni_entry, attr_count, attr_list);
-
-        case SAI_OBJECT_TYPE_IPMC_ENTRY:
-            return get(&metaKey.objectkey.key.ipmc_entry, attr_count, attr_list);
-
-        case SAI_OBJECT_TYPE_L2MC_ENTRY:
-            return get(&metaKey.objectkey.key.l2mc_entry, attr_count, attr_list);
-
-        default:
-
-            SWSS_LOG_ERROR("object type %s not implemented, FIXME", info->objecttypename);
-
-            return SAI_STATUS_FAILURE;
-    }
+    return status;
 }
 
 sai_status_t SaiInterface::switchMdioRead(
