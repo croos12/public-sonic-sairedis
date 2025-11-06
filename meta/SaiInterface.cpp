@@ -21,7 +21,7 @@ sai_status_t SaiInterface::create(
         return SAI_STATUS_FAILURE;
     }
     sai_status_t status = SAI_STATUS_NOT_EXECUTED;
-    SWSS_LOG_DEBUG("SAIInterface::create start: %s", sai_serialize_object_type(metaKey.objecttype).c_str());
+    SWSS_LOG_NOTICE("SAIInterface::create start: %s", sai_serialize_object_type(metaKey.objecttype).c_str());
     if (info->isobjectid)
     {
         status = create(metaKey.objecttype, &metaKey.objectkey.key.object_id, switch_id, attr_count, attr_list);
@@ -110,7 +110,7 @@ sai_status_t SaiInterface::create(
 
     }
 
-    SWSS_LOG_DEBUG("SAIInterface::create end: %s", sai_serialize_object_type(metaKey.objecttype).c_str());
+    SWSS_LOG_NOTICE("SAIInterface::create end: %s", sai_serialize_object_type(metaKey.objecttype).c_str());
 
     return status;
 }
@@ -129,7 +129,7 @@ sai_status_t SaiInterface::remove(
         return SAI_STATUS_FAILURE;
     }
     sai_status_t status = SAI_STATUS_NOT_EXECUTED;
-    SWSS_LOG_DEBUG("SAIInterface::remove start: %s", sai_serialize_object_type(metaKey.objecttype).c_str());
+    SWSS_LOG_NOTICE("SAIInterface::remove start: %s", sai_serialize_object_type(metaKey.objecttype).c_str());
 
     if (info->isobjectid)
     {
@@ -219,7 +219,7 @@ sai_status_t SaiInterface::remove(
 
     }
 
-    SWSS_LOG_DEBUG("SAIInterface::remove end: %s", sai_serialize_object_type(metaKey.objecttype).c_str());
+    SWSS_LOG_NOTICE("SAIInterface::remove end: %s", sai_serialize_object_type(metaKey.objecttype).c_str());
 
     return status;
 }
@@ -239,7 +239,7 @@ sai_status_t SaiInterface::set(
         return SAI_STATUS_FAILURE;
     }
     sai_status_t status = SAI_STATUS_NOT_EXECUTED;
-    SWSS_LOG_DEBUG("SAIInterface::set start: %s", sai_serialize_object_type(metaKey.objecttype).c_str());
+    SWSS_LOG_NOTICE("SAIInterface::set start: %s", sai_serialize_object_type(metaKey.objecttype).c_str());
 
     if (info->isobjectid)
     {
@@ -329,7 +329,7 @@ sai_status_t SaiInterface::set(
 
     }
 
-    SWSS_LOG_DEBUG("SAIInterface::set end: %s", sai_serialize_object_type(metaKey.objecttype).c_str());
+    SWSS_LOG_NOTICE("SAIInterface::set end: %s", sai_serialize_object_type(metaKey.objecttype).c_str());
 
     return status;
 }
@@ -350,7 +350,7 @@ sai_status_t SaiInterface::get(
         return SAI_STATUS_FAILURE;
     }
     sai_status_t status = SAI_STATUS_NOT_EXECUTED;
-    SWSS_LOG_DEBUG("SAIInterface::get start: %s", sai_serialize_object_type(metaKey.objecttype).c_str());
+    SWSS_LOG_NOTICE("SAIInterface::get start: %s", sai_serialize_object_type(metaKey.objecttype).c_str());
 
     if (info->isobjectid)
     {
@@ -439,7 +439,7 @@ sai_status_t SaiInterface::get(
         }
     }
 
-    SWSS_LOG_DEBUG("SAIInterface::get end: %s", sai_serialize_object_type(metaKey.objecttype).c_str());
+    SWSS_LOG_NOTICE("SAIInterface::get end: %s", sai_serialize_object_type(metaKey.objecttype).c_str());
 
     return status;
 }
